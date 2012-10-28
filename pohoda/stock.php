@@ -40,11 +40,6 @@ $affiliate = (Tools::getValue('ac') ? '?ac='.(int)(Tools::getValue('ac')) : '');
 //file_put_contents("stock.xml", $xml);
 
 
-// Send feed
-header("Content-Type:text/xml; charset=utf-8");
-echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-?>
-
 
 $dom = new DomDocument();
 $dom->load('stock.xml');
@@ -80,12 +75,12 @@ if($roots->length > 0){
 		$availability = $xpath->query('./stk:stockHeader/stk:availability', $node)->item(0)->nodeValue;
 
 
-
+/*
 echo $name ."\n";
 echo $code ."\n";
 echo $ean ."\n";
 echo "\n";
-
+*/
 
 
 
@@ -101,5 +96,10 @@ echo "\n";
             
         }
     }
-die;
 }
+
+// Send feed
+header("Content-Type:text/xml; charset=utf-8");
+echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+?>
+<rsp:responsePack xmlns:rsp="http://www.stormware.cz/schema/response.xsd" version="2.0" id="00000001" state="ok" application="Prestashop" note="Prestashop import"></rsp:responsePack>
