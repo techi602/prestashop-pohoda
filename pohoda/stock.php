@@ -171,6 +171,14 @@ if ($roots->length > 0) {
     		$shopdata['cache_default_attribute'] = 0;
     		addSlashesToArray($shopdata);
     		
+    		$stockdata = array();
+    		$stockdata['id_shop'] = $shopId;
+    		$stockdata['id_product'] = $id;
+    		$stockdata['quantity'] = $quantity;
+    		$stockdata['id_product_attribute'] = 0;
+    		$stockdata['id_shop_group'] = 0;
+    		
+    		
     		
     		
     		// product data
@@ -235,6 +243,24 @@ if ($roots->length > 0) {
     		    $shopdata['date_add'] = $date;
     		    $db->insert($table, $shopdata);
     		}
+    		
+    		// stockdata
+    		$table = 'stock_available';
+    		$query = new DbQuery();
+    		$query->select('COUNT(*)');
+    		$query->from($table, 'p');
+    		$query->where("p.id_product = '" . $db->escape($id) . "'");
+    		$query->where("p.id_shop = '" . $db->escape($shopId) . "'");
+    		$productStockExists = (int) $db->getValue($query);
+    		
+    		if ($productStockExists) {
+    		    $where = "id_product = '" . $db->escape($id) . "' AND id_shop = '" . $db->escape($shopId) . "'";
+    		    $db->update($table, $stockdata, $where);
+    		
+    		} else {
+    		    $db->insert($table, $stockdata);
+    		}
+    		
     		
     		// categories
     		$defaultCategory = 2;
