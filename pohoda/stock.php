@@ -93,7 +93,6 @@ $query->where("iso_code = 'cs'");
 $langId = $db->getValue($query);
 $date = date('Y-m-d H:i:s');
 
-
 if ($roots->length > 0) {
     for ($i = 0; $i < $roots->length; $i++) {
         $products = $xpath->query('./lStk:stock', $roots->item($i));
@@ -102,7 +101,6 @@ if ($roots->length > 0) {
             $node = $products->item($j);
     
             $id = $xpath->query('./stk:stockHeader/stk:id', $node)->item(0)->nodeValue;
-            
     		$name = $xpath->query('./stk:stockHeader/stk:name', $node)->item(0)->nodeValue;
     		$shortName = @$xpath->query('./stk:stockHeader/stk:shortName', $node)->item(0)->nodeValue;
     		$code = @$xpath->query('./stk:stockHeader/stk:code', $node)->item(0)->nodeValue;
@@ -116,16 +114,6 @@ if ($roots->length > 0) {
     		$availability = @$xpath->query('./stk:stockHeader/stk:availability', $node)->item(0)->nodeValue;
     		$description = @$xpath->query('./stk:stockHeader/stk:description', $node)->item(0)->nodeValue;
     		$description2 = @$xpath->query('./stk:stockHeader/stk:description2', $node)->item(0)->nodeValue;
-
-    		
-    		/*
-    		$query = new DbQuery();
-    		$query->select(implode(', ', array('p.`id_product`', 'p.`upc`', 'p.`ean13`')));
-    		$query->from('product', 'p');
-    		$query->where("p.ean13 = '" . $db->escape($ean) . "'");
-    		$result = $db->getRow($query);
-    		*/
-    		
 
     		$data = array();
     		$data['id_product'] = $id;
