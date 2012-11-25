@@ -146,8 +146,6 @@ if ($roots->length > 0) {
     		$data['cache_default_attribute'] = 1;
     		addSlashesToArray($data);
     		
-    		
-
     		$langdata = array();
     		$langdata['id_shop'] = $shopId;
     		$langdata['id_lang'] = $langId;
@@ -173,6 +171,9 @@ if ($roots->length > 0) {
     		$shopdata['cache_default_attribute'] = 0;
     		addSlashesToArray($shopdata);
     		
+    		
+    		
+    		// product data
     		$table = 'product';
     		$query = new DbQuery();
     		$query->select('COUNT(*)');
@@ -194,6 +195,8 @@ if ($roots->length > 0) {
     		    $db->insert($table, $data);
     		}
     		
+    		
+    		// language data
     		$table = 'product_lang';
     		$query = new DbQuery();
     		$query->select('COUNT(*)');
@@ -210,6 +213,7 @@ if ($roots->length > 0) {
     		    $db->insert($table, $langdata);
     		}
     		
+    		// shop data
     		$table = 'product_shop';
     		$query = new DbQuery();
     		$query->select('COUNT(*)');
@@ -232,6 +236,12 @@ if ($roots->length > 0) {
     		    $db->insert($table, $shopdata);
     		}
     		
+    		// categories
+    		$defaultCategory = 2;
+    		$table = 'category_product';
+    		$where = "id_product = '" . $db->escape($id) . "'";
+    		$db->delete($table, $where);
+    		$db->insert($table, array('id_product' => $id, 'id_category' => $defaultCategory));
     		
     		
     		
