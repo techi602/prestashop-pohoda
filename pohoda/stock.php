@@ -40,6 +40,8 @@ $products = Product::getProducts((int)Context::getContext()->language->id, 0, ($
 $currency = new Currency((int)Context::getContext()->currency->id);
 $affiliate = (Tools::getValue('ac') ? '?ac='.(int)(Tools::getValue('ac')) : '');
 
+$imageImportFolder = dirname(__FILE__) . '/../../import/images/';
+
 //$xml = file_get_contents("php://input");
 //file_put_contents("stock.xml", $xml);
 
@@ -114,7 +116,8 @@ if ($roots->length > 0) {
     		$availability = @$xpath->query('./stk:stockHeader/stk:availability', $node)->item(0)->nodeValue;
     		$description = @$xpath->query('./stk:stockHeader/stk:description', $node)->item(0)->nodeValue;
     		$description2 = @$xpath->query('./stk:stockHeader/stk:description2', $node)->item(0)->nodeValue;
-
+    		$defaultPicture = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture[@default="true"]/stk:filepath', $node)->item(0)->nodeValue;
+    		
     		$data = array();
     		$data['id_product'] = $id;
     		$data['ean13'] = $ean;
@@ -258,6 +261,37 @@ if ($roots->length > 0) {
     		$db->insert($table, array('id_product' => $id, 'id_category' => $defaultCategory));
     		
     		
+    		// images
+    		if ($defaultPicture) {
+    		    $table = 'image';
+    		    $query = new DbQuery();
+    		    $query->select('COUNT(*)');
+    		    $query->from($table, 'p');
+    		    $query->where("p.id_product = '" . $db->escape($id) . "'");
+    		    $productHasImages = (int) $db->getValue($query);
+    		    
+    		    
+    		    if (!$productHasImages) {
+        		    $imgFile = $imageImportFolder . $defaultPicture;
+        		    if (file_exists($imgFile)) {
+        		        $image = new Image();
+        		        $image->id_product = (int) ($id);
+        		        $image->position = Image::getHighestPosition($id) + 1;
+        		        $image->cover = 1;
+        		        $image->add();
+        		        
+        		        $new_path = $image->getPathForCreation();
+        		        
+        		        $imagesTypes = ImageType::getImagesTypes('products');
+        		        foreach ($imagesTypes as $imageType) {
+        		            if (!ImageManager::resize($imgFile, $new_path . '-' . stripslashes($imageType['name']) . '.' . $image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
+        		                var_dump(array('error' => Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name'])));
+        		            }
+        		        }
+        		        
+        		    }
+    		    }
+    		}
     		
 
 /*
