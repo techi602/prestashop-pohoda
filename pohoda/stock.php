@@ -25,8 +25,6 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-//define('_PS_DEBUG_SQL_', true);
-
 include(dirname(__FILE__).'/../../config/config.inc.php');
 require_once(dirname(__FILE__).'/../../init.php');
 
@@ -42,8 +40,10 @@ $affiliate = (Tools::getValue('ac') ? '?ac='.(int)(Tools::getValue('ac')) : '');
 
 $imageImportFolder = dirname(__FILE__) . '/../../import/images/';
 
-//$xml = file_get_contents("php://input");
-//file_put_contents("stock.xml", $xml);
+$headers = getallheaders();
+$debug = true;
+
+
 
 function createUrlSlug($url)
 {
@@ -75,15 +75,21 @@ function logResponse($message)
 }
 
 $dom = new DomDocument();
-$dom->load('stock.xml');
-
-//echo $dom->saveXml();
+if ($debug) {
+    $dom->load('stock.xml');
+} else {
+    $dom->load('php://input');
+    //$xml = file_get_contents("php://input");
+    //file_put_contents("stock.xml", $xml);
+    
+}
 
 $xpath = new DOMXPath($dom);
 
-
+// version 1.0
 //$roots = $xpath->query('//rsp:responsePackItem[@state=\'ok\']/lst:listStock[@state=\'ok\']');
 
+// version 2.0
 $roots = $xpath->query('//rsp:responsePackItem/lStk:listStock');
 
 //var_dump($roots->length);
@@ -291,10 +297,9 @@ if ($roots->length > 0) {
         		        $imagesTypes = ImageType::getImagesTypes('products');
         		        foreach ($imagesTypes as $imageType) {
         		            if (!ImageManager::resize($imgFile, $new_path . '-' . stripslashes($imageType['name']) . '.' . $image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
-        		                logResponse(Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name']));
+        		                logResponse(Tools::displayError('An error occurred while copying image:') . ' ' . stripslashes($imageType['name']));
         		            }
         		        }
-        		        
         		    }
     		    }
     		}
