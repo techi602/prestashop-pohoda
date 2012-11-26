@@ -168,7 +168,7 @@ if ($roots->length > 0) {
     		$stockdata['quantity'] = $quantity;
     		$stockdata['id_product_attribute'] = 0;
     		$stockdata['id_shop_group'] = 0;
-    		
+    		$stockdata['out_of_stock'] = 2; // default
     		
     		
     		
