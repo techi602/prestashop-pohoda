@@ -68,6 +68,12 @@ function addSlashesToArray(&$array)
     }
 }
 
+$log = array();
+function logResponse($message)
+{
+    $GLOBALS['log'][] = $message;
+}
+
 $dom = new DomDocument();
 $dom->load('stock.xml');
 
@@ -285,7 +291,7 @@ if ($roots->length > 0) {
         		        $imagesTypes = ImageType::getImagesTypes('products');
         		        foreach ($imagesTypes as $imageType) {
         		            if (!ImageManager::resize($imgFile, $new_path . '-' . stripslashes($imageType['name']) . '.' . $image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
-        		                var_dump(array('error' => Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name'])));
+        		                logResponse(Tools::displayError('An error occurred while copying image:').' '.stripslashes($imageType['name']));
         		            }
         		        }
         		        
@@ -318,7 +324,11 @@ echo "\n";
 }
 
 // Send feed
-//header("Content-Type:text/xml; charset=utf-8");
+header("Content-Type:text/xml; charset=utf-8");
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 ?>
-<rsp:responsePack xmlns:rsp="http://www.stormware.cz/schema/response.xsd" version="2.0" id="00000001" state="ok" application="Prestashop" note="Prestashop import"></rsp:responsePack>
+<rsp:responsePack xmlns:rsp="http://www.stormware.cz/schema/response.xsd" version="2.0" id="00000001" state="ok" application="Prestashop" note="Prestashop import">
+<?php foreach ($log as $message): ?>
+<message><?php echo htmlspecialchars($message) ?></message>
+<?php endforeach ?>
+</rsp:responsePack>
