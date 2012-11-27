@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
         <module>
             <name>Pohoda</name>
-            <displayName><![CDATA[Stormware Pohoda import]]></displayName>
-            <version><![CDATA[0.2]]></version>
-            <description><![CDATA[Stormware Pohoda import]]></description>
+            <displayName><![CDATA[Pohoda]]></displayName>
+            <version><![CDATA[0.1]]></version>
+            <description><![CDATA[Pohoda]]></description>
             <author><![CDATA[Techi]]></author>
             <tab><![CDATA[front_office_features]]></tab>
             <is_configurable>0</is_configurable>
