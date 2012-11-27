@@ -124,6 +124,7 @@ if ($roots->length > 0) {
     		$mass = @$xpath->query('./stk:stockHeader/stk:mass', $node)->item(0)->nodeValue;
     		$quantity = @$xpath->query('./stk:stockHeader/stk:count', $node)->item(0)->nodeValue;
     		$sellingPrice = $xpath->query('./stk:stockHeader/stk:sellingPrice', $node)->item(0)->nodeValue;
+    		$purchasingPrice = $xpath->query('./stk:stockHeader/stk:sellingPrice', $node)->item(0)->nodeValue;
     		$producer = @$xpath->query('./stk:stockHeader/stk:producer', $node)->item(0)->nodeValue;
     		$availability = @$xpath->query('./stk:stockHeader/stk:availability', $node)->item(0)->nodeValue;
     		$description = @$xpath->query('./stk:stockHeader/stk:description', $node)->item(0)->nodeValue;
@@ -140,6 +141,7 @@ if ($roots->length > 0) {
     		$data['active'] = $isSales == 'true';
     		$data['available_for_order'] = $isSales == 'true';
     		$data['price'] = $sellingPrice;
+    		$data['wholesale_price'] = $purchasingPrice;
     		$data['id_category_default'] = 1; // default
     		$data['id_shop_default'] = 1;
     		$data['id_tax_rules_group'] = 1;
