@@ -27,7 +27,7 @@
 
 include(dirname(__FILE__).'/../../config/config.inc.php');
 require_once(dirname(__FILE__).'/../../init.php');
-require_once(dirname(__FILE__).'functions.php');
+require_once(dirname(__FILE__).'/functions.php');
 
 // Get data
 
@@ -55,7 +55,7 @@ $content = file_get_contents("php://input");
 $file = "stock.xml";
 
 if (!empty($content)) {
-    $file = "stock" . date("_Y-m-d_H-i-s") . ".xml"
+    $file = "stock" . date("_Y-m-d_H-i-s") . ".xml";
     file_put_contents($file, $content);
 }
 $dom = new DomDocument();
@@ -127,8 +127,7 @@ if ($roots->length > 0) {
     		        $taxId = 0;
     		}
     		
-    		$active = $isInternet == 'true'
-    		
+    		$active = $isInternet == 'true';    		
     		$data = array();
     		$data['id_product'] = $id;
     		$data['ean13'] = $ean;
