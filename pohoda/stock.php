@@ -51,15 +51,16 @@ function logResponse($message)
     $GLOBALS['log'][] = $message;
 }
 
-$dom = new DomDocument();
-if ($debug) {
-    $dom->load('stock.xml');
-} else {
-    $dom->load('php://input');
-    //$xml = file_get_contents("php://input");
-    //file_put_contents("stock.xml", $xml);
-    
+$content = file_get_contents("php://input");
+$file = "stock.xml";
+
+if (!empty($content)) {
+    $file = "stock" . date("_Y-m-d_H-i-s") . ".xml"
+    file_put_contents($file, $content);
 }
+$dom = new DomDocument();
+$dom->load($file);
+    
 
 $xpath = new DOMXPath($dom);
 
@@ -106,7 +107,27 @@ if ($roots->length > 0) {
     		$availability = @$xpath->query('./stk:stockHeader/stk:availability', $node)->item(0)->nodeValue;
     		$description = @$xpath->query('./stk:stockHeader/stk:description', $node)->item(0)->nodeValue;
     		$description2 = @$xpath->query('./stk:stockHeader/stk:description2', $node)->item(0)->nodeValue;
+    		$vatRate = @$xpath->query('./stk:stockHeader/stk:purchasingRateVAT', $node)->item(0)->nodeValue;
     		$defaultPicture = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture[@default="true"]/stk:filepath', $node)->item(0)->nodeValue;
+    		
+    		switch ($vatRate) {
+    		    case 'none':
+    		        $taxId = 0;
+    		        break;
+    		        
+    		    case 'low':
+    		        $taxId = 2;
+    		        break;
+    		        
+    		    case 'high':
+    		        $taxId = 1;
+    		        break;
+    		        
+    		    default:
+    		        $taxId = 0;
+    		}
+    		
+    		$active = $isInternet == 'true'
     		
     		$data = array();
     		$data['id_product'] = $id;
@@ -115,8 +136,8 @@ if ($roots->length > 0) {
     		$data['reference'] = $code;
     		$data['quantity'] = $quantity;
     		$data['weight'] = $mass;
-    		$data['active'] = $isSales == 'true';
-    		$data['available_for_order'] = $isSales == 'true';
+    		$data['active'] = $active;
+    		$data['available_for_order'] = $active;
     		$data['price'] = $sellingPrice;
     		$data['wholesale_price'] = $purchasingPrice;
     		$data['id_category_default'] = 1; // default
@@ -126,6 +147,7 @@ if ($roots->length > 0) {
     		$data['show_price'] = 1;
     		$data['indexed'] = 1;
     		$data['cache_default_attribute'] = 1;
+    		$data['id_tax_rules_group'] = $taxId;
     		addSlashesToArray($data);
     		
     		$langdata = array();
@@ -146,7 +168,7 @@ if ($roots->length > 0) {
     		$shopdata['id_shop'] = $shopId;
     		$shopdata['on_sale'] = 1;
     		$shopdata['id_product'] = $id;
-    		$shopdata['active'] = $isSales == 'true';
+    		$shopdata['active'] = $active;
     		$shopdata['id_category_default'] = 1;
     		$shopdata['id_tax_rules_group'] = 1;
     		$shopdata['indexed'] = 1;
