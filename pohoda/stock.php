@@ -131,7 +131,7 @@ if ($roots->length > 0) {
     		    $name = $shortName;
     		}
     		
-    		$active = $isInternet == 'true';    		
+    		$active = (int) ($isInternet == 'true');    		
     		$data = array();
     		$data['id_product'] = $id;
     		$data['ean13'] = $ean;
@@ -146,9 +146,9 @@ if ($roots->length > 0) {
     		$data['id_category_default'] = 1; // default
     		$data['id_shop_default'] = 1;
     		$data['id_tax_rules_group'] = 1;
-    		$data['on_sale'] = 1;
+    		$data['on_sale'] = (int) $active;
     		$data['show_price'] = 1;
-    		$data['indexed'] = 1;
+    		$data['indexed'] = (int) $active;
     		$data['cache_default_attribute'] = 1;
     		$data['id_tax_rules_group'] = $taxId;
     		addSlashesToArray($data);
@@ -169,7 +169,7 @@ if ($roots->length > 0) {
     		$shopdata = array();
     		$shopdata['price'] = $sellingPrice;
     		$shopdata['id_shop'] = $shopId;
-    		$shopdata['on_sale'] = 1;
+    		$shopdata['on_sale'] = $active;
     		$shopdata['id_product'] = $id;
     		$shopdata['active'] = $active;
     		$shopdata['id_category_default'] = 1;
