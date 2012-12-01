@@ -132,9 +132,29 @@ if ($roots->length > 0) {
     		    $name = $shortName;
     		}
     		
+    		$manufacturerId = 0;
+    		if (!empty($producer)) {
+        		$table = 'manufacturer';
+        		$query = new DbQuery();
+        		$query->select('id_manufacturer');
+        		$query->from($table, 'p');
+        		$query->where("p.name LIKE '" . $db->escape($producer) . "'");
+        		$manufacturerId = (int) $db->getValue($query);
+        		
+        		if (empty($manufacturerId)) {
+        		    $manufacturer = new Manufacturer();
+        		    $manufacturer->name = $producer;
+        		    $manufacturer->active = true;
+        		    $manufacturer->save();
+        		    
+        		    $manufacturerId = $manufacturer->id;
+        		}
+    		}
+    		
     		$active = (int) ($isInternet == 'true');    		
     		$data = array();
     		$data['id_product'] = $id;
+    		$data['id_manufacturer'] = $manufacturerId;
     		$data['ean13'] = $ean;
     		$data['upc'] = '';
     		$data['reference'] = $code;
