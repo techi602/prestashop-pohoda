@@ -127,6 +127,10 @@ if ($roots->length > 0) {
     		        $taxId = 0;
     		}
     		
+    		if (!empty($shortName)) {
+    		    $name = $shortName;
+    		}
+    		
     		$active = $isInternet == 'true';    		
     		$data = array();
     		$data['id_product'] = $id;
