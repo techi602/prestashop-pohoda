@@ -1,6 +1,6 @@
 <?php
 $content = file_get_contents("php://input");
-$file = "stock.xml";
+$file = "categories.xml";
 
 if (!empty($content)) {
     $file = "categories" . date("_Y-m-d_H-i-s") . ".xml";
