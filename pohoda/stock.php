@@ -109,6 +109,7 @@ if ($roots->length > 0) {
     		$description2 = @$xpath->query('./stk:stockHeader/stk:description2', $node)->item(0)->nodeValue;
     		$vatRate = @$xpath->query('./stk:stockHeader/stk:purchasingRateVAT', $node)->item(0)->nodeValue;
     		$defaultPicture = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture[@default="true"]/stk:filepath', $node)->item(0)->nodeValue;
+    		$recommended = @$xpath->query('./stk:stockHeader/stk:recommended', $node)->item(0)->nodeValue;
     		
     		switch ($vatRate) {
     		    case 'none':
