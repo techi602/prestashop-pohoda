@@ -120,9 +120,20 @@ if ($roots->length > 0) {
     		        $category = (int) $categories->item($i)->nodeValue;
     		        if ($category) {
     		            $categoryIds[] = $category;
-    		            $categoryDefaultId = $category;
     		        }
     		    }
+    		}
+    		
+    		if ($categoryIds) {
+    		    // find deepest
+    		    $table = 'category';
+    		    $query = new DbQuery();
+    		    $query->select('id_category');
+    		    $query->from($table, 'p');
+    		    $query->where("p.id_category IN (" . implode(', ', $categoryIds) . ")");
+    		    $query->orderBy('level_depth DESC');
+    		  
+    		    $categoryDefaultId = (int) $db->getValue($query);
     		}
     		
     		switch ($vatRate) {
