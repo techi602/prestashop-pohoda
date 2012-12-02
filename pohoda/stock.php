@@ -111,6 +111,17 @@ if ($roots->length > 0) {
     		$defaultPicture = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture[@default="true"]/stk:filepath', $node)->item(0)->nodeValue;
     		$recommended = @$xpath->query('./stk:stockHeader/stk:recommended', $node)->item(0)->nodeValue;
     		
+    		$categoryIds = array();
+    		$categories = @$xpath->query('./stk:stockHeader/stk:categories/stk:idCategory', $node);
+    		if ($categories) {
+    		    for ($i = 0; $i < $categories->length; $i++) {
+    		        $category = (int) $categories->item($i)->nodeValue;
+    		        if ($category) {
+    		            $categoryIds[] = $category;
+    		        }
+    		    }
+    		}
+    		
     		switch ($vatRate) {
     		    case 'none':
     		        $taxId = 0;
@@ -295,8 +306,14 @@ if ($roots->length > 0) {
     		$table = 'category_product';
     		$where = "id_product = '" . $db->escape($id) . "'";
     		$db->delete($table, $where);
-    		$db->insert($table, array('id_product' => $id, 'id_category' => $defaultCategory));
     		
+    		if ($recommended) {
+    		    $db->insert($table, array('id_product' => $id, 'id_category' => $defaultCategory));
+    		}
+    		
+    		foreach ($categoryIds as $categoryId) {
+    		    $db->insert($table, array('id_product' => $id, 'id_category' => $categoryId));
+    		}
     		
     		// images
     		if ($defaultPicture) {
