@@ -32,6 +32,13 @@ function importCategories($file, $blindMode)
     
     $db = DbCore::getInstance();
     
+    $table = 'category';
+    $query = new DbQuery();
+    $query->select('id_category');
+    $query->from($table, 'p');
+    $query->where("p.is_root_category = 1");
+    $rootCategory = (int) $db->getValue($query);
+    
     while ($xml->read()) {
         
         if ($xml->nodeType == XmlReader::ELEMENT && $xml->name == 'ctg:name') {
@@ -52,19 +59,15 @@ function importCategories($file, $blindMode)
             $sequence = $xml->value;
         }
         
-        
-        
         if ($xml->nodeType == XmlReader::ELEMENT && $xml->name == 'ctg:id') {
             $xml->read();
             
             $id = (int) $xml->value;
-            
-            //echo "$id (" . @$parents[$depth] . ")<br>\n";
         }
 
         if ($xml->nodeType == XmlReader::ELEMENT && $xml->name == 'ctg:internetParams') {
             // hack - we insert category here
-            $parent = 1;
+            $parent = $rootCategory; // root category
             if (isset($parents[$depth])) {
                 $parent = $parents[$depth];
             }
