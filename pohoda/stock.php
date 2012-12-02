@@ -39,11 +39,12 @@ $products = Product::getProducts((int)Context::getContext()->language->id, 0, ($
 $currency = new Currency((int)Context::getContext()->currency->id);
 $affiliate = (Tools::getValue('ac') ? '?ac='.(int)(Tools::getValue('ac')) : '');
 
-$imageImportFolder = dirname(__FILE__) . '/../../import/images/';
+define('IMAGE_IMPORT_FOLDER', _PS_ROOT_DIR_ . DIRECTORY_SEPARATOR . 'import' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR);
 
 $headers = getallheaders();
 $debug = true;
 
+// $_POST['forceIDs'] = true;
 
 $log = array();
 function logResponse($message)
@@ -108,7 +109,8 @@ if ($roots->length > 0) {
     		$description = @$xpath->query('./stk:stockHeader/stk:description', $node)->item(0)->nodeValue;
     		$description2 = @$xpath->query('./stk:stockHeader/stk:description2', $node)->item(0)->nodeValue;
     		$vatRate = @$xpath->query('./stk:stockHeader/stk:purchasingRateVAT', $node)->item(0)->nodeValue;
-    		$defaultPicture = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture[@default="true"]/stk:filepath', $node)->item(0)->nodeValue;
+    		//$defaultPicture = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture[@default="true"]/stk:filepath', $node)->item(0)->nodeValue;
+    		$pictures = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture', $node);
     		$recommended = @$xpath->query('./stk:stockHeader/stk:recommended', $node)->item(0)->nodeValue == 'true';
     		$sale = @$xpath->query('./stk:stockHeader/stk:sale', $node)->item(0)->nodeValue == 'true';
     		
@@ -314,7 +316,6 @@ if ($roots->length > 0) {
     		    $db->insert($table, $stockdata);
     		}
     		
-    		
     		// categories
     		$defaultCategory = 2;
     		$table = 'category_product';
@@ -330,56 +331,53 @@ if ($roots->length > 0) {
     		}
     		
     		// images
-    		if ($defaultPicture) {
-    		    $table = 'image';
-    		    $query = new DbQuery();
-    		    $query->select('COUNT(*)');
-    		    $query->from($table, 'p');
-    		    $query->where("p.id_product = '" . $db->escape($id) . "'");
-    		    $productHasImages = (int) $db->getValue($query);
-    		    
-    		    
-    		    if (!$productHasImages) {
-        		    $imgFile = $imageImportFolder . $defaultPicture;
-        		    if (file_exists($imgFile)) {
+    		if ($pictures) {
+    		    foreach ($pictures as $picture) {
+    		        $mynode = new DOMXPath($picture->parentNode->ownerDocument);
+    		        $cover =  $picture->getAttribute('default') == 'true';
+    		        $imageId =  $mynode->query('./typ:id', $picture)->item(0)->nodeValue;
+    		        $filepath =  $mynode->query('./stk:filepath', $picture)->item(0)->nodeValue;
+    		        $imageDesc = $mynode->query('./stk:description', $picture)->item(0)->nodeValue;
+    		        
+    		        $table = 'image';
+    		        $query = new DbQuery();
+    		        $query->select('COUNT(*)');
+    		        $query->from($table, 'p');
+    		        $query->where("p.id_image = '" . $db->escape($imageId) . "'");
+    		        $productHasImage = (int) $db->getValue($query);
+    		        
+    		        if (!$productHasImage) {
+    		            $db->insert('image', array('id_image' => $imageId, 'id_product' => $id));
+    		        }
+    		        
+    		        $imgFile = IMAGE_IMPORT_FOLDER . $filepath;
+    		        
+    		        $fileExists = file_exists($imgFile);
+    		        if (!$fileExists) {
+    		            logResponse('Image not found ' . $imgFile);
+    		        } else {
         		        $image = new Image();
         		        $image->id_product = (int) ($id);
-        		        $image->position = Image::getHighestPosition($id) + 1;
-        		        $image->cover = 1;
-        		        $image->add();
+        		        $image->cover = (int) $cover;
+        		        $image->id = $imageId;
+        		        $image->id_image = $imageId;
+        		        $image->save();
+        		        $db->update('image_lang', array('legend' => addslashes($imageDesc)), "id_image = '" . $db->escape($image->id_image) . "'");
         		        
-        		        $new_path = $image->getPathForCreation();
-        		        
-        		        $imagesTypes = ImageType::getImagesTypes('products');
-        		        foreach ($imagesTypes as $imageType) {
-        		            if (!ImageManager::resize($imgFile, $new_path . '-' . stripslashes($imageType['name']) . '.' . $image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
-        		                logResponse(Tools::displayError('An error occurred while copying image:') . ' ' . stripslashes($imageType['name']));
+        		        if ($fileExists && !is_dir(_PS_IMG_DIR_ . 'p' . DIRECTORY_SEPARATOR . $imageId)) {
+        		            $new_path = $image->getPathForCreation();
+        		            if (file_exists($imgFile)) { 
+            		            $imagesTypes = ImageType::getImagesTypes('products');
+            		            foreach ($imagesTypes as $imageType) {
+            		                if (!ImageManager::resize($imgFile, $new_path . '-' . stripslashes($imageType['name']) . '.' . $image->image_format, $imageType['width'], $imageType['height'], $image->image_format)) {
+            		                    logResponse('An error occurred while copying image:' . ' ' . stripslashes($imageType['name']));
+            		                }
+            		            }
         		            }
         		        }
-        		    }
+    		        }
     		    }
     		}
-    		
-
-/*
-echo $name ."\n";
-echo $code ."\n";
-echo $ean ."\n";
-echo "\n";
-*/
-
-
-
-
-            
-    //        foreach ($node->childNodes as $node2) {
-//                var_dump($node2->nodeName);
-  //              foreach ($node2->childNodes as $node3) {
-  //                  var_dump($node3->nodeName);
-//                    var_dump($node3->nodeValue);
-//                }
-//            }
-            
         }
     }
 }
