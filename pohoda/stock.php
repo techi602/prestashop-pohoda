@@ -111,6 +111,7 @@ if ($roots->length > 0) {
     		$defaultPicture = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture[@default="true"]/stk:filepath', $node)->item(0)->nodeValue;
     		$recommended = @$xpath->query('./stk:stockHeader/stk:recommended', $node)->item(0)->nodeValue;
     		
+    		$categoryDefaultId = 1;
     		$categoryIds = array();
     		$categories = @$xpath->query('./stk:stockHeader/stk:categories/stk:idCategory', $node);
     		if ($categories) {
@@ -118,6 +119,7 @@ if ($roots->length > 0) {
     		        $category = (int) $categories->item($i)->nodeValue;
     		        if ($category) {
     		            $categoryIds[] = $category;
+    		            $categoryDefaultId = $category;
     		        }
     		    }
     		}
@@ -204,8 +206,8 @@ if ($roots->length > 0) {
     		$shopdata['on_sale'] = $active;
     		$shopdata['id_product'] = $id;
     		$shopdata['active'] = $active;
-    		$shopdata['id_category_default'] = 1;
-    		$shopdata['id_tax_rules_group'] = 1;
+    		$shopdata['id_category_default'] = $categoryDefaultId;
+    		$shopdata['id_tax_rules_group'] = $taxId;
     		$shopdata['indexed'] = 1;
     		$shopdata['cache_default_attribute'] = 0;
     		addSlashesToArray($shopdata);
