@@ -97,8 +97,8 @@ if ($roots->length > 0) {
     		$shortName = @$xpath->query('./stk:stockHeader/stk:shortName', $node)->item(0)->nodeValue;
     		$code = @$xpath->query('./stk:stockHeader/stk:code', $node)->item(0)->nodeValue;
     		$ean = @$xpath->query('./stk:stockHeader/stk:EAN', $node)->item(0)->nodeValue;
-    		$isSales = $xpath->query('./stk:stockHeader/stk:isSales', $node)->item(0)->nodeValue;
-    		$isInternet = @$xpath->query('./stk:stockHeader/stk:isInternet', $node)->item(0)->nodeValue;
+    		$isSales = $xpath->query('./stk:stockHeader/stk:isSales', $node)->item(0)->nodeValue == 'true';
+    		$isInternet = @$xpath->query('./stk:stockHeader/stk:isInternet', $node)->item(0)->nodeValue == 'true';
     		$mass = @$xpath->query('./stk:stockHeader/stk:mass', $node)->item(0)->nodeValue;
     		$quantity = @$xpath->query('./stk:stockHeader/stk:count', $node)->item(0)->nodeValue;
     		$sellingPrice = $xpath->query('./stk:stockHeader/stk:sellingPrice', $node)->item(0)->nodeValue;
@@ -109,7 +109,8 @@ if ($roots->length > 0) {
     		$description2 = @$xpath->query('./stk:stockHeader/stk:description2', $node)->item(0)->nodeValue;
     		$vatRate = @$xpath->query('./stk:stockHeader/stk:purchasingRateVAT', $node)->item(0)->nodeValue;
     		$defaultPicture = @$xpath->query('./stk:stockHeader/stk:pictures/stk:picture[@default="true"]/stk:filepath', $node)->item(0)->nodeValue;
-    		$recommended = @$xpath->query('./stk:stockHeader/stk:recommended', $node)->item(0)->nodeValue;
+    		$recommended = @$xpath->query('./stk:stockHeader/stk:recommended', $node)->item(0)->nodeValue == 'true';
+    		$sale = @$xpath->query('./stk:stockHeader/stk:sale', $node)->item(0)->nodeValue == 'true';
     		
     		$categoryDefaultId = 1;
     		$categoryIds = array();
@@ -164,7 +165,7 @@ if ($roots->length > 0) {
         		}
     		}
     		
-    		$active = (int) ($isInternet == 'true');    		
+    		$active = (int) $isInternet;    		
     		$data = array();
     		$data['id_product'] = $id;
     		$data['id_manufacturer'] = $manufacturerId;
@@ -180,7 +181,7 @@ if ($roots->length > 0) {
     		$data['id_category_default'] = 1; // default
     		$data['id_shop_default'] = 1;
     		$data['id_tax_rules_group'] = 1;
-    		$data['on_sale'] = (int) $active;
+    		$data['on_sale'] = (int) $sale;
     		$data['show_price'] = 1;
     		$data['indexed'] = (int) $active;
     		$data['cache_default_attribute'] = 1;
@@ -203,7 +204,7 @@ if ($roots->length > 0) {
     		$shopdata = array();
     		$shopdata['price'] = $sellingPrice;
     		$shopdata['id_shop'] = $shopId;
-    		$shopdata['on_sale'] = $active;
+    		$shopdata['on_sale'] = $sale;
     		$shopdata['id_product'] = $id;
     		$shopdata['active'] = $active;
     		$shopdata['id_category_default'] = $categoryDefaultId;
