@@ -86,6 +86,7 @@ function importCategories($file, $blindMode)
                     $category->description = $description;
                     $category->position = $sequence;
                     $category->id_parent = $parent;
+                    $category->doNotRegenerateNTree = true;
                     $category->save();
                 } catch (Exception $e) {
                     echo $e->getMessage() . " $id $parent\n";
