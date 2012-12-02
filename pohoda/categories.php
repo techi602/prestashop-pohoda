@@ -59,6 +59,12 @@ function importCategories($file, $blindMode)
             $sequence = $xml->value;
         }
         
+        if ($xml->nodeType == XmlReader::ELEMENT && $xml->name == 'ctg:displayed') {
+            $xml->read();
+        
+            $displayed = $xml->value == 'true';
+        }
+        
         if ($xml->nodeType == XmlReader::ELEMENT && $xml->name == 'ctg:id') {
             $xml->read();
             
@@ -89,8 +95,11 @@ function importCategories($file, $blindMode)
                     $category->description = $description;
                     $category->position = $sequence;
                     $category->id_parent = $parent;
+                    $category->active = (int) $displayed;
                     $category->doNotRegenerateNTree = true;
                     $category->save();
+                    
+                    $db->update('category_shop', array('position' => $sequence), "id_category = '" . $db->escape($id) . "'");
                 } catch (Exception $e) {
                     echo $e->getMessage() . " $id $parent\n";
                 }
