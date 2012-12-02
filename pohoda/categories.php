@@ -95,9 +95,12 @@ function importCategories($file, $blindMode)
                     echo $e->getMessage() . " $id $parent\n";
                 }
             }
+            // debug
+            //echo str_repeat('+', $depth) . ' ' . $id . " ($parent)\n";
         }
 
         if ($xml->nodeType == XmlReader::ELEMENT && $xml->name == 'ctg:subCategories') {
+            
             $depth++;
             
             if (!isset($parents[$depth])) {
@@ -106,6 +109,7 @@ function importCategories($file, $blindMode)
         }
         
         if ($xml->nodeType == XmlReader::END_ELEMENT && $xml->name == 'ctg:subCategories') {
+            unset($parents[$depth]);
             $depth--;
         }
     }
