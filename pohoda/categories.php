@@ -18,6 +18,7 @@ if (!empty($content)) {
 
 function importCategories($file, $blindMode)
 {
+    $date = date('Y-m-d H:i:s');
     
     $xml = new XMLReader();
     $xml->open($file);
@@ -81,7 +82,7 @@ function importCategories($file, $blindMode)
             if ($blindMode) {
                 try {
                     // hack - we can not save category unless it already exists
-                    $db->insert('category', array('id_category' => $id, 'id_parent' => $parent, 'date_add' => date('Y-m-d H:i:s')));
+                    $db->insert('category', array('id_category' => $id, 'id_parent' => $parent, 'date_add' => $date));
                 } catch (Exception $e) {
 
                 }
@@ -124,6 +125,10 @@ function importCategories($file, $blindMode)
     }
     
     $xml->close();
+    
+    if ($blindMode) {
+        $db->update('category', array('date_add' => $date), "date_add = '0000-00-00 00:00:00'");
+    }
 }
 
 importCategories($file, true);
