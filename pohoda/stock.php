@@ -180,6 +180,14 @@ if ($roots->length > 0) {
                 }
             }
 
+            // ean check
+            if ($ean) {
+                if (!isValidEan13($ean)) {
+                    $ean = null;
+                }
+            }
+
+
             $active = (int) $isInternet;
             $data = array();
             $data['id_product'] = $id;
