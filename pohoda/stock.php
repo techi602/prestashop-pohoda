@@ -107,7 +107,7 @@ if ($roots->length > 0) {
             $sale = @$xpath->query('./stk:stockHeader/stk:sale', $node)->item(0)->nodeValue == 'true';
             $news = @$xpath->query('./stk:stockHeader/stk:news', $node)->item(0)->nodeValue == 'true';
 
-            $categoryDefaultId = 1;
+            $categoryDefaultId = $rootCategory;
             $categoryIds = array();
             $categories = @$xpath->query('./stk:stockHeader/stk:categories/stk:idCategory', $node);
             if ($categories) {
