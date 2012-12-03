@@ -30,21 +30,12 @@ require_once(dirname(__FILE__).'/../../init.php');
 require_once(dirname(__FILE__).'/functions.php');
 
 // Get data
-
-$number = ((int)(Tools::getValue('n')) ? (int)(Tools::getValue('n')) : 10);
-$orderBy = Tools::getProductsOrder('by', Tools::getValue('orderby'));
-$orderWay = Tools::getProductsOrder('way', Tools::getValue('orderway'));
-$id_category = ((int)(Tools::getValue('id_category')) ? (int)(Tools::getValue('id_category')) : Configuration::get('PS_HOME_CATEGORY'));
-$products = Product::getProducts((int)Context::getContext()->language->id, 0, ($number > 10 ? 10 : $number), $orderBy, $orderWay, $id_category, true);
-$currency = new Currency((int)Context::getContext()->currency->id);
-$affiliate = (Tools::getValue('ac') ? '?ac='.(int)(Tools::getValue('ac')) : '');
+$rootCategory = ((int)(Tools::getValue('id_category')) ? (int)(Tools::getValue('id_category')) : Configuration::get('PS_HOME_CATEGORY')); // 1
 
 define('IMAGE_IMPORT_FOLDER', _PS_ROOT_DIR_ . DIRECTORY_SEPARATOR . 'import' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR);
 
 $headers = getallheaders();
 $debug = true;
-
-// $_POST['forceIDs'] = true;
 
 $log = array();
 function logResponse($message)
