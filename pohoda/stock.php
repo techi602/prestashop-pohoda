@@ -389,7 +389,7 @@ if ($roots->length > 0) {
                     $imgFile = IMAGE_IMPORT_FOLDER . $filepath;
 
                     $fileExists = file_exists($imgFile);
-                    if (!$fileExists) {
+                    if (!$fileExists && !$productHasImage) {
                         logResponse('Image not found ' . $imgFile);
                     } else {
                         $image = new Image();
