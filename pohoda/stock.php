@@ -61,7 +61,7 @@ if (!empty($content)) {
 }
 $dom = new DomDocument();
 $dom->load($file);
-    
+
 
 $xpath = new DOMXPath($dom);
 
@@ -114,6 +114,7 @@ if ($roots->length > 0) {
             $parameters = @$xpath->query('./stk:stockHeader/stk:intParameters/stk:intParameter', $node);
             $recommended = @$xpath->query('./stk:stockHeader/stk:recommended', $node)->item(0)->nodeValue == 'true';
             $sale = @$xpath->query('./stk:stockHeader/stk:sale', $node)->item(0)->nodeValue == 'true';
+            $news = @$xpath->query('./stk:stockHeader/stk:news', $node)->item(0)->nodeValue == 'true';
 
             $categoryDefaultId = 1;
             $categoryIds = array();
@@ -235,7 +236,11 @@ if ($roots->length > 0) {
             $stockdata['id_shop_group'] = 0;
             $stockdata['out_of_stock'] = 2; // default
 
-
+            // novninky hack
+            if ($news) {
+                $data['date_add'] = $date;
+                $shopdata['date_add'] = $date;
+            }
 
             // product data
             $table = 'product';
@@ -258,7 +263,6 @@ if ($roots->length > 0) {
 
                 $db->insert($table, $data);
             }
-
 
             // language data
             $table = 'product_lang';
@@ -330,18 +334,18 @@ if ($roots->length > 0) {
             foreach ($categoryIds as $categoryId) {
                 $db->insert($table, array('id_product' => $id, 'id_category' => $categoryId));
             }
-            
+
             // parameters
             if ($parameters) {
                 foreach ($parameters as $parameter) {
                     $mynode = new DOMXPath($parameter->parentNode->ownerDocument);
-                    
+
                     $paramId = $mynode->query('./stk:intParameterID', $parameter)->item(0)->nodeValue;
                     $paramName = $mynode->query('./stk:intParameterName', $parameter)->item(0)->nodeValue;
                     $paramOrder = $mynode->query('./stk:intParameterOrder', $parameter)->item(0)->nodeValue;
                     $paramType = $mynode->query('./stk:intParameterType', $parameter)->item(0)->nodeValue;
                     $paramValue = @$mynode->query('./stk:intParameterValues/stk:intParameterValue/stk:parameterValue', $parameter)->item(0)->nodeValue;
-                    
+
                     if ($paramValue) {
                         if ($paramType == 'numberValue') {
                             $paramValue = (float) str_replace(',', '.', $paramValue);
@@ -352,12 +356,12 @@ if ($roots->length > 0) {
                     $feature->id = $paramId;
                     $feature->position = $paramOrder;
                     $feature->save();
-                    
+
                     $featureValue = new FeatureValue();
                     $featureValue->id_feature = $paramId;
                     $featureValue->value = $paramValue;
                     */
-                    
+
                     //var_dump($paramValue);
                 }
             }
