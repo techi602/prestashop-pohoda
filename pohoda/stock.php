@@ -87,6 +87,7 @@ if ($roots->length > 0) {
             $id = $xpath->query('./stk:stockHeader/stk:id', $node)->item(0)->nodeValue;
             $name = $xpath->query('./stk:stockHeader/stk:name', $node)->item(0)->nodeValue;
             $shortName = @$xpath->query('./stk:stockHeader/stk:shortName', $node)->item(0)->nodeValue;
+            $nameComplement = @$xpath->query('./stk:stockHeader/stk:nameComplement', $node)->item(0)->nodeValue;
             $code = @$xpath->query('./stk:stockHeader/stk:code', $node)->item(0)->nodeValue;
             $ean = @$xpath->query('./stk:stockHeader/stk:EAN', $node)->item(0)->nodeValue;
             $isSales = $xpath->query('./stk:stockHeader/stk:isSales', $node)->item(0)->nodeValue == 'true';
@@ -148,11 +149,15 @@ if ($roots->length > 0) {
                     $taxId = 0;
             }
 
-            if (!empty($description) {
-                $name = trim($description);
-            } elseif (!empty($shortName)) {
-                $name = $shortName;
+            /*
+            if (!empty($description2)) {
+                $name = trim($description2);
             }
+            */
+            if (!empty($nameComplement)) {
+                $name = $nameComplement;
+            }
+            
 
             $manufacturerId = 0;
             if (!empty($producer)) {
