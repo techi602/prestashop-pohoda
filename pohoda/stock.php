@@ -153,7 +153,7 @@ if ($roots->length > 0) {
             } elseif (!empty($shortName)) {
                 $name = $shortName;
             }
-            
+
             $manufacturerId = 0;
             if (!empty($producer)) {
                 $table = 'manufacturer';
@@ -214,6 +214,7 @@ if ($roots->length > 0) {
             $langdata['available_later'] = $availability;
             $langdata['id_shop'] = $shopId;
             $langdata['id_product'] = $id;
+            $langdata['meta_title'] = trim($producer . ' - ' . $name);
             addSlashesToArray($langdata);
 
             $shopdata = array();
