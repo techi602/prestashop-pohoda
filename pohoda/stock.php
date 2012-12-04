@@ -148,10 +148,12 @@ if ($roots->length > 0) {
                     $taxId = 0;
             }
 
-            if (!empty($shortName)) {
+            if (!empty($description) {
+                $name = trim($description);
+            } elseif (!empty($shortName)) {
                 $name = $shortName;
             }
-
+            
             $manufacturerId = 0;
             if (!empty($producer)) {
                 $table = 'manufacturer';
@@ -177,7 +179,6 @@ if ($roots->length > 0) {
                     $ean = null;
                 }
             }
-
 
             $active = (int) $isInternet;
             $data = array();
@@ -206,7 +207,7 @@ if ($roots->length > 0) {
             $langdata['id_shop'] = $shopId;
             $langdata['id_lang'] = $langId;
             $langdata['description'] = $description2;
-            $langdata['description_short'] = $description;
+            //$langdata['description_short'] = $description;
             $langdata['link_rewrite'] = createUrlSlug($name);
             $langdata['name'] = $name;
             $langdata['available_now'] = 'Skladem';
