@@ -40,6 +40,7 @@ $debug = true;
 $log = array();
 function logResponse($message)
 {
+  file_put_contents("log.txt", date('Y-m-d H:i:s') . ' ' . $message . "\n", FILE_APPEND );
     $GLOBALS['log'][] = $message;
 }
 
@@ -317,12 +318,12 @@ if ($roots->length > 0) {
             $query->from($table, 'p');
             $query->where("p.id_product = '" . $db->escape($id) . "'");
             $query->where("p.id_shop = '" . $db->escape($shopId) . "'");
+            $query->where('id_product_attribute = 0');
             $productStockExists = (int) $db->getValue($query);
 
             if ($productStockExists) {
-                $where = "id_product = '" . $db->escape($id) . "' AND id_shop = '" . $db->escape($shopId) . "'";
+                $where = "id_product = '" . $db->escape($id) . "' AND id_shop = '" . $db->escape($shopId) . "' AND id_product_attribute = 0";
                 $db->update($table, $stockdata, $where);
-
             } else {
                 $db->insert($table, $stockdata);
             }
@@ -406,7 +407,9 @@ if ($roots->length > 0) {
                         $image->save();
                         $db->update('image_lang', array('legend' => addslashes($imageDesc)), "id_image = '" . $db->escape($image->id_image) . "'");
 
-                        if ($fileExists && !is_dir(_PS_IMG_DIR_ . 'p' . DIRECTORY_SEPARATOR . $imageId)) {
+                        $imgFolder = Image::getImgFolderStatic($imageId);
+                        
+                        if ($fileExists && !is_dir(_PS_IMG_DIR_ . 'p' . DIRECTORY_SEPARATOR . $imgFolder)) {
                             $new_path = $image->getPathForCreation();
                             if (file_exists($imgFile)) {
                                 $imagesTypes = ImageType::getImagesTypes('products');
@@ -420,9 +423,17 @@ if ($roots->length > 0) {
                     }
                 }
             }
+            
+            logResponse("Product $id saved");
+            
         }
+        
+        logResponse("Total $j products imported");
+        
     }
 }
+
+logResponse("IMPORT COMPLETE");
 
 // Send feed
 header("Content-Type:text/xml; charset=utf-8");
